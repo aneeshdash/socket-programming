@@ -86,7 +86,7 @@ void client(){
 		scanf("%s",r1->type);
 		printf("Enter the request\n");
 		scanf("%s",r1->text);
-		//r2=proxy(r1);
+		//*r2=proxy(r1);
 		*r2=server(*r1);
 		printf("The Response received is\n");
 		printf("%s %s\n",r2->type,r2->text);
