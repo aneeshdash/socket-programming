@@ -14,7 +14,7 @@ int main( int argc, char *argv[] ) {
     char * ip;
     char * domain;
     char * req;
-    int found=0;
+    int found;
     f= fopen ("database.txt","r");
     if (f == NULL)
         exit(EXIT_FAILURE);
@@ -71,7 +71,7 @@ int main( int argc, char *argv[] ) {
       exit(1);
    }
    
-   
+   found=0;
     if(buffer[0]=='1')
     {
         req= strtok (buffer," ");
