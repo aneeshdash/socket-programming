@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
        exit(1);
    }
    /* Send message to the server */
-   n = write(sockfd, buffer, strlen(buffer));
+   n = send(sockfd, buffer, strlen(buffer),0);
 
    if (n < 0) {
       perror("ERROR writing to socket");
@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
 
    /* Now read server response */
    bzero(buffer,256);
-   n = read(sockfd, buffer, 255);
+   n = recv(sockfd, buffer, 255,0);
 
    if (n < 0) {
       perror("ERROR reading from socket");

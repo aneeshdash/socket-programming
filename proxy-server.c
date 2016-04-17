@@ -31,7 +31,6 @@ int main( int argc, char *argv[] ) {
 
    /* First call to socket() function */
    client_sockfd = socket(AF_INET, SOCK_STREAM, 0);
-   server_sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
    if (client_sockfd < 0) {
       perror("ERROR opening socket");
@@ -65,11 +64,11 @@ int main( int argc, char *argv[] ) {
    bcopy((char *)server->h_addr, (char *)&serv_addr.sin_addr.s_addr, server->h_length);
    serv_addr.sin_port = htons(server_portno);
 
-   /* Now connect to the server */
-   if (connect(server_sockfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
-      perror("ERROR connecting");
-      exit(1);
-   }
+   // /* Now connect to the server */
+   // if (connect(server_sockfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
+   //    perror("ERROR connecting");
+   //    exit(1);
+   // }
 
    /* Now start listening for the clients, here process will
       * go in sleep mode and will wait for the incoming connection
@@ -92,7 +91,7 @@ int main( int argc, char *argv[] ) {
 
        /* If connection is established then start communicating */
        bzero(client_buffer,256);
-       n = read( client_newsockfd,client_buffer,255 );
+       n = recv( client_newsockfd,client_buffer,255,0 );
 
        if (n < 0) {
           perror("ERROR reading from socket");
@@ -100,6 +99,7 @@ int main( int argc, char *argv[] ) {
        }
 
        found=0;
+       printf("Request: %s", client_buffer);
         if(client_buffer[0]=='1')
         {
             strcpy(temp_buffer, client_buffer);
@@ -117,15 +117,24 @@ int main( int argc, char *argv[] ) {
             if(found==1)
             {
                 printf("Found in cache\n");
-                n = write(client_newsockfd,"3 ",2);
-                n = write(client_newsockfd,ip,18);
+                n = send(client_newsockfd,"3 ",2,0);
+                n = send(client_newsockfd,ip,18,0);
 
             }
             else
             {
                 printf("Not found in cache\n");
+
+                /* create socket for connecting to server */
+                server_sockfd = socket(AF_INET, SOCK_STREAM, 0);
+                /* Now connect to the server */
+                if (connect(server_sockfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
+                   perror("ERROR connecting");
+                   exit(1);
+                }
+
                 /* Send message to the server */
-                n = write(server_sockfd, client_buffer, strlen(client_buffer));
+                n = send(server_sockfd, client_buffer, strlen(client_buffer),0);
                 if (n < 0) {
                    perror("ERROR writing to socket");
                    exit(1);
@@ -133,15 +142,13 @@ int main( int argc, char *argv[] ) {
 
                 /* Now read server response */
                 bzero(server_buffer,256);
-                printf("hell\n");
-                n = read(server_sockfd, server_buffer, 255);
-                printf("hello\n");
+                n = recv(server_sockfd, server_buffer, 255,0);
                 if (n < 0) {
                    perror("ERROR reading from socket");
                    exit(1);
                 }
 
-                n = write(client_newsockfd, server_buffer, 255);
+                n = send(client_newsockfd, server_buffer, strlen(server_buffer),0);
 
                 if(server_buffer[0] == '3')
                 {
@@ -151,7 +158,8 @@ int main( int argc, char *argv[] ) {
                     strcpy(cache[fifo][0], req);
                     fifo = (fifo + 1) % 3;
                 }
-
+                //close connection after communication
+                close(server_sockfd);
             }
         }
         else if(client_buffer[0] == '2')
@@ -171,15 +179,23 @@ int main( int argc, char *argv[] ) {
             if(found==1)
             {
                 printf("Found in cache\n");
-                n = write(client_newsockfd,"3 ",2);
-                n = write(client_newsockfd,domain,18);
+                n = send(client_newsockfd,"3 ",2,0);
+                n = send(client_newsockfd,domain,18,0);
             }
             else
             {
                 printf("Not found in cache\n");
-                /* Send message to the server */
-                n = write(server_sockfd, client_buffer, strlen(client_buffer));
 
+                /* create socket for connecting to server */
+                server_sockfd = socket(AF_INET, SOCK_STREAM, 0);
+                /* Now connect to the server */
+                if (connect(server_sockfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
+                   perror("ERROR connecting");
+                   exit(1);
+                }
+
+                /* Send message to the server */
+                n = send(server_sockfd, client_buffer, strlen(client_buffer),0);
                 if (n < 0) {
                    perror("ERROR writing to socket");
                    exit(1);
@@ -187,14 +203,14 @@ int main( int argc, char *argv[] ) {
 
                 /* Now read server response */
                 bzero(server_buffer,256);
-                n = read(server_sockfd, server_buffer, strlen(server_buffer));
+                n = recv(server_sockfd, server_buffer, 255,0);
 
                 if (n < 0) {
                    perror("ERROR reading from socket");
                    exit(1);
                 }
 
-                n = write(client_newsockfd, server_buffer, strlen(server_buffer));
+                n = send(client_newsockfd, server_buffer, strlen(server_buffer),0);
 
                 if(server_buffer[0] == '3')
                 {
@@ -204,11 +220,13 @@ int main( int argc, char *argv[] ) {
                     strcpy(cache[fifo][1], req);
                     fifo = (fifo + 1) % 3;
                 }
+                //close connection after communication
+                close(server_sockfd);
             }
         }
 
         else {
-            n = write(client_newsockfd,"ERROR in request format",23);
+            n = send(client_newsockfd,"ERROR in request format",23,0);
         }
 
        /* Write a response to the client */

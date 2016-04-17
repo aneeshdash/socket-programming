@@ -15,6 +15,7 @@ int main( int argc, char *argv[] ) {
     char * domain;
     char * req;
     int found;
+    int flags;
     f= fopen ("database.txt","r");
     if (f == NULL)
         exit(EXIT_FAILURE);
@@ -68,7 +69,7 @@ int main( int argc, char *argv[] ) {
 
        /* If connection is established then start communicating */
        bzero(buffer,256);
-       n = read( newsockfd,buffer,255 );
+       n = recv( newsockfd,buffer,255,0);
 
        if (n < 0) {
           perror("ERROR reading from socket");
@@ -77,6 +78,7 @@ int main( int argc, char *argv[] ) {
 
        found=0;
        rewind(f);
+       printf("Request: %s", buffer);
         if(buffer[0]=='1')
         {
             req= strtok (buffer," ");
@@ -94,13 +96,12 @@ int main( int argc, char *argv[] ) {
             }
             if(found==1)
             {
-                n = write(newsockfd,"3 ",2);
-                n = write(newsockfd,ip,18);
-
+                n = send(newsockfd,"3 ",2,0);
+                n = send(newsockfd,ip,strlen(ip),0);
             }
             else
             {
-               n = write(newsockfd,"4 entry not found in the database",35);
+               n = send(newsockfd,"4 entry not found in the database",35,0);
 
             }
         }
@@ -119,17 +120,17 @@ int main( int argc, char *argv[] ) {
             }
             if(found==1)
             {
-                n = write(newsockfd,"3 ",2);
-                n = write(newsockfd,domain,18);
+                n = send(newsockfd,"3 ",2,0);
+                n = send(newsockfd,domain,strlen(domain),0);
             }
             else
             {
-                 n = write(newsockfd,"4 entry not found in the database",35);
+                 n = send(newsockfd,"4 entry not found in the database",35,0);
             }
         }
 
         else {
-            n = write(newsockfd,"ERROR in request format",23);
+            n = send(newsockfd,"ERROR in request format",23,0);
         }
 
        /* Write a response to the client */
