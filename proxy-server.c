@@ -118,7 +118,7 @@ int main( int argc, char *argv[] ) {
             {
                 printf("Found in cache\n");
                 n = send(client_newsockfd,"3 ",2,0);
-                n = send(client_newsockfd,ip,18,0);
+                n = send(client_newsockfd,ip,strlen(ip),0);
 
             }
             else
@@ -180,7 +180,7 @@ int main( int argc, char *argv[] ) {
             {
                 printf("Found in cache\n");
                 n = send(client_newsockfd,"3 ",2,0);
-                n = send(client_newsockfd,domain,18,0);
+                n = send(client_newsockfd,domain,strlen(ip),0);
             }
             else
             {
