@@ -91,7 +91,7 @@ int main( int argc, char *argv[] ) {
 
        /* If connection is established then start communicating */
        bzero(client_buffer,256);
-       n = recv( client_newsockfd,client_buffer,255,0 );
+       n = recv( client_newsockfd,client_buffer,255,0);
 
        if (n < 0) {
           perror("ERROR reading from socket");
@@ -117,8 +117,10 @@ int main( int argc, char *argv[] ) {
             if(found==1)
             {
                 printf("Found in cache\n");
-                n = send(client_newsockfd,"3 ",2,0);
-                n = send(client_newsockfd,ip,strlen(ip),0);
+                char out[256];
+                sprintf(out,"3 %s",ip);
+                // n = send(newsockfd,"3 ",2,0);
+                n = send(client_newsockfd,out,strlen(out),0);
 
             }
             else
@@ -179,8 +181,10 @@ int main( int argc, char *argv[] ) {
             if(found==1)
             {
                 printf("Found in cache\n");
-                n = send(client_newsockfd,"3 ",2,0);
-                n = send(client_newsockfd,domain,strlen(ip),0);
+                char out[256];
+                sprintf(out,"3 %s",domain);
+                // n = send(newsockfd,"3 ",2,0);
+                n = send(client_newsockfd,out,strlen(out),0);
             }
             else
             {

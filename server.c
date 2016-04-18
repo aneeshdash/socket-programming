@@ -122,6 +122,7 @@ int main( int argc, char *argv[] ) {
             }
             if(found==1)
             {
+                char out[256];
                 sprintf(out,"3 %s",domain);
                 // n = send(newsockfd,"3 ",2,0);
                 n = send(newsockfd,out,strlen(out),0);
