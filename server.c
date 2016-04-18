@@ -96,8 +96,10 @@ int main( int argc, char *argv[] ) {
             }
             if(found==1)
             {
-                n = send(newsockfd,"3 ",2,0);
-                n = send(newsockfd,ip,strlen(ip),0);
+                char out[256];
+                sprintf(out,"3 %s",ip);
+                // n = send(newsockfd,"3 ",2,0);
+                n = send(newsockfd,out,strlen(out),0);
             }
             else
             {
@@ -120,8 +122,9 @@ int main( int argc, char *argv[] ) {
             }
             if(found==1)
             {
-                n = send(newsockfd,"3 ",2,0);
-                n = send(newsockfd,domain,strlen(domain),0);
+                sprintf(out,"3 %s",domain);
+                // n = send(newsockfd,"3 ",2,0);
+                n = send(newsockfd,out,strlen(out),0);
             }
             else
             {
